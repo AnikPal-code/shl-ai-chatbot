@@ -1,0 +1,40 @@
+# API
+fastapi
+uvicorn[standard]
+
+# Web Scraping
+requests
+beautifulsoup4
+lxml
+
+# Environment
+python-dotenv
+
+# Data
+pandas
+numpy
+
+# Validation
+pydantic
+
+# HTTP
+httpx
+
+# LLM
+langchain
+langchain-core
+langchain-mistralai
+
+# Embeddings
+sentence-transformers
+
+# Vector Search
+faiss-cpu
+
+# Testing
+pytest
+pytest-asyncio
+
+# Utilities
+orjson
+tqdm
