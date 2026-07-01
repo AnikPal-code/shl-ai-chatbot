@@ -1,61 +1,39 @@
 import json
-import faiss
-import numpy as np
-from sentence_transformers import SentenceTransformer
 from pathlib import Path
+
 
 class AssessmentRetriever:
 
-    def __init__(self, catalog_path="data/catalog_clean.json"):
+    def __init__(self):
 
-        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        base_dir = Path(__file__).resolve().parent.parent
+        catalog_path = base_dir / "data" / "catalog_clean.json"
 
         with open(catalog_path, "r", encoding="utf-8") as f:
             self.catalog = json.load(f)
 
-        documents = []
+    def search(self, query, k=5):
+
+        query = query.lower()
+
+        scored = []
 
         for item in self.catalog:
 
+            score = 0
+
             text = (
-                item["name"]
-                + "\n"
-                + item["description"]
-            )
+                item["name"] + " " +
+                item["description"]
+            ).lower()
 
-            documents.append(text)
+            for word in query.split():
 
-        embeddings = self.model.encode(
-            documents,
-            convert_to_numpy=True,
-            normalize_embeddings=True
-        )
+                if word in text:
+                    score += 1
 
-        dimension = embeddings.shape[1]
+            scored.append((score, item))
 
-        self.index = faiss.IndexFlatIP(dimension)
+        scored.sort(key=lambda x: x[0], reverse=True)
 
-        self.index.add(embeddings)
-
-    def search(self, query, k=5):
-
-        query_embedding = self.model.encode(
-            [query],
-            convert_to_numpy=True,
-            normalize_embeddings=True
-        )
-
-        scores, indices = self.index.search(query_embedding, k)
-
-        results = []
-
-        for score, idx in zip(scores[0], indices[0]):
-            if idx == -1:
-                continue
-            
-            item = self.catalog[idx].copy()
-            item["score"] = float(score)
-            
-            results.append(item)
-            
-        return results
+        return [item for _, item in scored[:k]]

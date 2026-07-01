@@ -25,11 +25,6 @@ langchain
 langchain-core
 langchain-mistralai
 
-# Embeddings
-sentence-transformers
-
-# Vector Search
-faiss-cpu
 
 # Testing
 pytest
